@@ -1,26 +1,28 @@
 /**
- * @brief A cell that contains a value from 0 to 9, with 0 being more than one true value in the array and 1-9 being the position index +1. 
+ * @brief A cell that contains a value from 0 to VALUES, with 0 being more than one true value in the array and 1-VALUES being the position index +1. 
 */
 
 #include <iostream>
 
+#define VALUES 9
+
 class Cell{
 private:
-    bool value[9]; //*Holding the cell value from 0-9 
+    bool value[VALUES]; //*Holding the cell value from 0-VALUES 
     bool solved = false; //*Is the cell solved or not 
 
 public:
 
     //*Constructor
     Cell(){
-        for(int i = 0; i < 9; i++){
+        for(int i = 0; i < VALUES; i++){
             value[i] = true;
         }
     }
 
     //*Prints outs possible numbers
     void printArray(){
-        for (int i = 0; i<9; i++){
+        for (int i = 0; i<VALUES; i++){
             std::cout << ((value[i])? i+1:0) << ", ";
         }
         std::cout << std::endl;
@@ -42,7 +44,7 @@ public:
         if ( index < 0 || index > 8){
             return;
         }
-        for(int j = 0; j < 9; j++){
+        for(int j = 0; j < VALUES; j++){
             if(j != index){
                 value[j] = false;
             }
@@ -55,7 +57,7 @@ public:
         if ( index < 0 || index > 8){
             return;
         }
-        for(int j = 0; j < 9; j++){
+        for(int j = 0; j < VALUES; j++){
             if(j == index){
                 value[j] = false;
             }
@@ -69,7 +71,7 @@ public:
             std::cout << "0 ";
             return;
         }
-        for(int i = 0; i < 9; i++){
+        for(int i = 0; i < VALUES; i++){
             if(value[i]){
                 std::cout << i+1 << " ";
             }
@@ -79,7 +81,7 @@ public:
     //*Checks if the cell has one true value
     bool checkSingularity(){
         int count = 0;
-        for(int i = 0; i < 9; i++){
+        for(int i = 0; i < VALUES; i++){
             if(value[i]){
                 count++;
             }
@@ -95,7 +97,7 @@ public:
     int giveSingularity(){
         if (!checkSingularity())
             return -1;
-        for(int i = 0; i < 9; i++){
+        for(int i = 0; i < VALUES; i++){
             if(value[i]){
                 return i;
             }
