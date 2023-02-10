@@ -13,6 +13,14 @@ private:
 
 public:
 
+    bool * getValue(){
+        bool * array = new bool[VALUES];
+        for(int i = 0; i < VALUES; i++){
+            array[i] = value[i];
+        }
+        return array;
+    }
+
     //*Constructor
     Cell(){
         for(int i = 0; i < VALUES; i++){
@@ -62,6 +70,14 @@ public:
                 value[j] = false;
             }
         }
+        checkSolved();
+    }
+
+    void setValueTrue(int index){
+        if ( index < 0 || index > 8){
+            return;
+        }
+        value[index] = true;
         checkSolved();
     }
 

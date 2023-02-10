@@ -9,31 +9,51 @@
  * 
  */
 
+#include <cmath>
 #include <iostream>
 #include "Cell.cpp"
 
 using namespace std;
 
 #define GRID 9
-#define NUMOFRULES 2
+#define NUMOFRULES 1
 
 class Board{
 private:
     Cell board[GRID][GRID];
-    bool Columns[GRID];
-    bool Rows[GRID];
-    bool Diagonals[2];
-    bool Variants[NUMOFRULES] {
-        false, //X-Cross 
-        false
-    };
+    bool Columns[GRID],
+         Rows[GRID], 
+         Quadrants[GRID];
 
+    //*Prints the cell at the given row and column
     void printCell(int row, int column){
         board[row][column].printArray();
     }
+
+    //*Prints the given array of size GRID
+    void printArr(int arr[]){
+        printArr(arr, GRID);
+    }
+
+    //*Prints the given array of any size
+    void printArr(int arr[], int size){
+        for (int i = 0; i < size; i++){
+            cout << arr[i] << ", ";
+        }
+        cout << endl;
+    }
+
+    //*Sets array to false for all indexes
     void Initialize(bool arr[], int size){
         for (int i =0; i < size; i++){
             arr[i] = false;
+        }
+    }
+
+    //*Sets array to 0 for all indexes
+    void Initialize(int arr[], int size){
+        for (int i =0; i < size; i++){
+            arr[i] = 0;
         }
     }
 
@@ -48,10 +68,6 @@ public:
         }
         Initialize(Columns, GRID);
         Initialize(Rows, GRID);
-        Initialize(Diagonals, 2);
-        Initialize(Variants, NUMOFRULES);
-
-
     }
 
     //*Prints the board
@@ -154,9 +170,11 @@ public:
         if(Rows[row]){
             return true;
         }
+        //Goes through the row taking note of all the used indexes
         for (int i=0; i<GRID; i++){
             usedIndexes[board[row][i].giveSingularity()] = true;
         }
+        //Makes sure that all the indexes are used
         for (int i=0; i<GRID; i++){
             if(!usedIndexes[i]){
                 return false;
@@ -172,9 +190,11 @@ public:
         if(Columns[column]){
             return true;
         }
+        //Goes through the column taking note of all the used indexes
         for (int i=0; i<GRID; i++){
             usedIndexes[board[i][column].giveSingularity()] = true;
         }
+        //Makes sure that all the indexes are used
         for (int i=0; i<GRID; i++){
             if(!usedIndexes[i]){
                 return false;
@@ -184,31 +204,117 @@ public:
         return true;
     }
 
-    //*checks if Board is solved
-    bool BoardSolved(bool const rules[]){
+    //* Checks a singular quadrant to see if the quadrant is solved
+    bool checkSquare(int row, int column){
+        bool usedIndexes[GRID];
+        Initialize(usedIndexes, GRID);
+        int cRow = row - (row%3);
+        int cColumn = column - (column%3);
+        if (Quadrants[(cRow%3)*3+cColumn%3])
+            return true;
+        //Goes through the quadrant taking note of all the used indexes
+        for(int i = cRow; i<3+cRow;i++){
+            for (int j =cColumn; j<3+cColumn; j++){
+                if(board[i][j].getSolved()){
+                    usedIndexes[board[i][j].giveSingularity()] = true;
+                }
+            }
+        }
+        //Checks if all the indexes are used
         for (int i=0; i<GRID; i++){
-            if(!checkRow(i) || !checkColumn(i) || !checkXCross())
-                //if(!checkVariants(rules))
+            if(!usedIndexes[i]){
+                return false;
+            }
+        }
+        Quadrants[(cRow%3)*3+cColumn%3] = true;
+        return true;
+        
+    }
+
+    //*Checks if there is a pair in the square
+    //? Currently does nothing
+    void pairInSquare(int squareIndex){
+        int anchorX = 3*floor(squareIndex/3),
+            anchorY = 3*(squareIndex%3),
+            posX[3] = {0, 0, 0},
+            posY[3] = {0, 0, 0},
+            apperances[9] = {0,0,0,0,0,0,0,0,0};
+        bool sameX = false,
+             sameY = false;
+
+        for (int row =0; row<3; row++){
+            for (int col =0; col<3; col++){
+                if(!board[anchorX+row][anchorY+col].getSolved()){
+                    addToArray( apperances, board[anchorX+row][anchorY+col].getValue());
+                }
+            }
+        }
+        for (int i=0; i<9; i++){
+            if(apperances[i] == 3 || apperances[i] == 2){
+                for (int row =0; row<3; row++){
+                    for (int col =0; col<3; col++){
+                        if(!board[anchorX+row][anchorY+col].getSolved() && board[anchorX+row][anchorY+col].getValue()[i]){
+                             if (squareIndex == 5)
+                                cout << "Found a " << i+1 << " at " << anchorX+row << ", " << anchorY+col << endl; 
+                            for (int pos=0; pos<3; pos++){
+                                if(posX[pos] == 0){
+                                    posX[pos] = anchorX+row;
+                                    posY[pos] = anchorY+col;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+    }
+
+    //*Checks if the array has same values
+    int sameValues(int arr[3]){
+        bool same = false;
+        int sharedIndex = -1;
+
+        if(arr[0] != arr[1] || (arr[1] != arr[2] && arr[2] != 0)){
+            return -1;
+        }
+        return arr[0];
+    }
+
+    //*Adds 1 to the index of an array if the value is true
+    void addToArray(int arr[], bool value[]){
+        for (int i =0; i<GRID; i++){
+            if(value[i]){
+                arr[i]++;
+            }
+        }
+    }
+
+    //*checks if Board is solved
+    bool BoardSolved(){
+        for (int i=0; i<GRID; i++){
+            if(!checkRow(i) || !checkColumn(i))
                     return false;
         }
         return true;
     }
 
     //*Solves the board
-    void Solve(bool const rules[NUMOFRULES]){
+    void Solve(){
         int i = 0;
-        while(!BoardSolved(rules)){
+        while(!BoardSolved() && i<3){
             for (int i=0; i<GRID; i++){
                 for (int j=0; j<GRID; j++){
                     if(board[i][j].getSolved()){
                         standardRule(i,j);
-                        setXCross();
-                        //variantRules(rules);
                     }
+                    pairInSquare(i);
                 }
             }
             i++;
-            loading(i);
         }
         cout << endl;
         printBoard();
@@ -222,110 +328,40 @@ public:
                 cout << ".";
         }
         cout << " (" << i << ")";
-    }
-
-    bool VariantRules(bool const rules[NUMOFRULES]){
-        for (int i =0; i< NUMOFRULES; i++)
-            if (rules[i])
-                return true;
-        return false;
-    }
-
-    void variantRules(bool const rules[NUMOFRULES]){
-        if (VariantRules(rules))
-            return;
-        if(rules[0]){ 
-            setXCross();
-        }
-    }
-
-    bool checkVariants(bool const rules[NUMOFRULES]){
-        if (!VariantRules(rules))
-            return true;
-        bool checkedRules[NUMOFRULES];
-        Initialize(checkedRules, NUMOFRULES);
-        if (rules[0])
-            checkedRules[0] = checkXCross();
-        for (int i =0; i<NUMOFRULES; i++){
-            if (!checkedRules[i]){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    void setXCross(){
-        bool arrLeft[GRID] = {false,false,false,false,false,false,false,false,false};
-        bool arrRight[GRID] = {false,false,false,false,false,false,false,false,false};
-        for (int i = 0; i<GRID; i++){
-            if(board[i][i].getSolved()){
-                arrLeft[board[i][i].giveSingularity()] = true;
-            }
-            if(board[i][8-i].getSolved()){
-                arrRight[board[i][8-i].giveSingularity()] = true;
-            }
-        }
-        for (int i = 0; i<GRID; i++){
-            if(!board[i][i].getSolved()){
-                for (int j=0; j<GRID; j++){
-                    if(arrLeft[j])
-                        board[i][i].setSingularValue(j);
-                }
-            }
-            if(!board[i][8-i].getSolved()){
-                for (int j=0; j<GRID; j++){
-                    if(arrRight[j])
-                        board[i][8-i].setSingularValue(j);
-                }
-            }
-        }
-    }
-
-    bool checkXCross(){
-        bool usedIndexesLeft[GRID];
-        Initialize(usedIndexesLeft, GRID);
-        bool usedIndexesRight[GRID];
-        Initialize(usedIndexesLeft, GRID);
-        if(Diagonals[0] && Diagonals[1]){
-            return true;
-        }
-        for (int i=0; i<GRID; i++){
-            usedIndexesLeft[board[i][i].giveSingularity()] = true;
-            usedIndexesRight[board[i][8-i].giveSingularity()] = true;
-        }
-        for (int i=0; i<GRID; i++){
-            if(!usedIndexesLeft[i]){
-                Diagonals[0] = false;
-                return false;
-            } else
-                Diagonals[0] = true;
-            if (!usedIndexesRight[i]){
-                Diagonals[1] = false;
-                return false;
-            } else 
-                Diagonals[1] = true;
-        }
-        return true;
-    }
+    }    
 };
 
 int main(){
+    int ezBoard[9][9] 
+         {{5, 3, 0, 0, 7, 0, 0, 0, 0},
+          {6, 0, 0, 1, 9, 5, 0, 0, 0},
+          {0, 9, 8, 0, 0, 0, 0, 6, 0},
+          {8, 0, 0, 0, 6, 0, 0, 0, 3},
+          {4, 0, 0, 8, 0, 3, 0, 0, 1},
+          {7, 0, 0, 0, 2, 0, 0, 0, 6},
+          {0, 6, 0, 0, 0, 0, 2, 8, 0},
+          {0, 0, 0, 4, 1, 9, 0, 0, 5},
+          {0, 0, 0, 0, 8, 0, 0, 7, 9}};
+
     int board[9][9] 
-         {{0, 0, 0, 1, 0, 6, 0, 3, 2},
-          {0, 0, 0, 0, 0, 9, 0, 0, 0},
-          {0, 0, 0, 0, 2, 0, 0, 0, 8},
-          {3, 6, 0, 0, 0, 5, 9, 0, 0},
-          {0, 0, 0, 0, 6, 0, 0, 0, 0},
-          {0, 0, 4, 9, 0, 0, 0, 6, 5},
-          {2, 0, 0, 0, 8, 0, 0, 0, 0},
-          {0, 0, 0, 3, 0, 0, 0, 0, 0},
-          {4, 9, 0, 5, 0, 1, 0, 0, 0}};
+         {{8, 7, 9, 0, 4, 0, 0, 0, 0},
+          {6, 0, 0, 0, 0, 2, 9, 0, 0},
+          {0, 0, 0, 0, 0, 7, 0, 8, 0},
+          {0, 2, 4, 0, 0, 6, 0, 0, 3},
+          {0, 0, 1, 0, 0, 0, 2, 0, 0},
+          {3, 0, 0, 2, 0, 0, 4, 9, 0},
+          {0, 4, 0, 8, 0, 0, 0, 0, 0},
+          {0, 0, 3, 7, 0, 0, 0, 0, 4},
+          {0, 0, 0, 0, 5, 0, 3, 6, 8}};
 
     Board b(board);
 
-    bool activeRules[NUMOFRULES] = {true,false};
-
     b.printBoard();
-    b.Solve(activeRules);
+    b.Solve();
+    
+    Board b2(ezBoard);
+
+    b2.Solve();
+    
     return 0;
 }

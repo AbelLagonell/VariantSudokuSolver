@@ -1,5 +1,7 @@
 # For Internal Use (in VSCode need the TODO MD extension)
-(A) X-Cross
+(A) The strategies 
+    (A) Row and columns pairs
+(B) X-Cross
 (B) Chess Moves
     (A) King
     (A) Knight
