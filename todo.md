@@ -6,7 +6,6 @@
     (A) King
     (A) Knight
     (A) Bishop
-    (A) Queen
 (C) Consecutive Numbers
 (C) Non-consecutive Numbers
 (D) Palindrome

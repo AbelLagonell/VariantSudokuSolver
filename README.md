@@ -9,15 +9,14 @@ This program should have the ability to solve many variations of Sudoku
 The Variants I plan to implement include
 - X-Cross - Diagonals of the Sqaure board cannot have the same number
 - Chess Moves - A piece's movement represents where the numbers cannot be the same
-  - King
-  - Knight
-  - Bishop
-  - Queen
+  - King - 3x3 space
+  - Knight - end of **L** 
+  - Bishop - Diagonal from the cell
 - Consecutive Numbers - Numbers must have chronological numbers next to them in the orthogonal directions
 - Non-consecutive Numbers - Numbers cannot have chronological numbers next to them in the orthogonal directions
 - Palindrome - Within a line the numbers have to be in a palindrome such that the last two number are the same, and the next two numbers inwards are the same, and so on.
-- Thermostat - Sudoku that has 3x3s inside
-- Hyper Sudoku 
+- Thermostat - Bulb has the smallest digit while the rest are in ascending order, not necessarily in chronological order
+- Hyper Sudoku - Sudoku that has 3x3s inside
 - Varying Size of board - both in terms of square and rectangle boards as well as irregular boards
 --- 
 
