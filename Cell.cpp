@@ -13,6 +13,7 @@ private:
 
 public:
 
+    //*Returns the bool array
     bool * getValue(){
         bool * array = new bool[VALUES];
         for(int i = 0; i < VALUES; i++){
@@ -49,7 +50,7 @@ public:
 
     //*Setting the value of the cell making everything but the index position 
     void setValue(int index){
-        if ( index < 0 || index > 8){
+        if ( index < 0 || index > 8 || solved){
             return;
         }
         for(int j = 0; j < VALUES; j++){
@@ -73,6 +74,7 @@ public:
         checkSolved();
     }
 
+    //* Sets the index of the cell to true
     void setValueTrue(int index){
         if ( index < 0 || index > 8){
             return;

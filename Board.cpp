@@ -35,6 +35,12 @@ private:
         printArr(arr, GRID);
     }
 
+    void printArr(bool arr[]){
+        for (int i = 0; i < GRID; i++){
+            cout << ((arr[i])? i+1:0) << ", ";
+        }
+    }
+
     //*Prints the given array of any size
     void printArr(int arr[], int size){
         for (int i = 0; i < size; i++){
@@ -135,7 +141,27 @@ public:
             }
         }
     }
-    
+
+    //* Sets the column to not include the index apart from the cells that are in the square provided
+    void setColumn(int column, int squareIndex, int index){
+        for (int row=0; row<GRID; row++){
+            if(!board[row][column].getSolved() && 3*floor(row/3) + floor(column/3) != squareIndex){
+                standardRule(row,column);
+                board[row][column].setSingularValue(index);
+            }
+        }
+    }
+
+    //* Sets the row to not include the index apart from the cells that are in the square provided
+    void setRow(int row, int squareIndex, int index){
+        for (int column=0; column<GRID; column++){
+            if(!board[row][column].getSolved() && 3*floor(row/3) + floor(column/3) != squareIndex){
+                standardRule(row,column);
+                board[row][column].setSingularValue(index);
+            }
+        }
+    }
+
     //*Sets it so that the quadrant cannot have the number
     void setSquare(int row, int column){
         bool arr[GRID];
@@ -232,7 +258,6 @@ public:
     }
 
     //*Checks if there is a pair in the square
-    //? Currently does nothing
     void pairInSquare(int squareIndex){
         int anchorX = 3*floor(squareIndex/3),
             anchorY = 3*(squareIndex%3),
@@ -242,6 +267,7 @@ public:
         bool sameX = false,
              sameY = false;
 
+        //Counts the number of apperances
         for (int row =0; row<3; row++){
             for (int col =0; col<3; col++){
                 if(!board[anchorX+row][anchorY+col].getSolved()){
@@ -249,13 +275,21 @@ public:
                 }
             }
         }
+        //First checks if there is one instance and then sets it to that square and then uses pairs to dismiss posibilities
         for (int i=0; i<9; i++){
+            if (apperances[i] == 1){
+               for (int row =0; row<3; row++){
+                    for (int col =0; col<3; col++){
+                        if(!board[anchorX+row][anchorY+col].getSolved() && board[anchorX+row][anchorY+col].getValue()[i]){
+                            board[anchorX+row][anchorY+col].setValue(i);
+                        }
+                    }
+               } 
+            }
             if(apperances[i] == 3 || apperances[i] == 2){
                 for (int row =0; row<3; row++){
                     for (int col =0; col<3; col++){
                         if(!board[anchorX+row][anchorY+col].getSolved() && board[anchorX+row][anchorY+col].getValue()[i]){
-                             if (squareIndex == 5)
-                                cout << "Found a " << i+1 << " at " << anchorX+row << ", " << anchorY+col << endl; 
                             for (int pos=0; pos<3; pos++){
                                 if(posX[pos] == 0){
                                     posX[pos] = anchorX+row;
@@ -263,21 +297,27 @@ public:
                                     break;
                                 }
                             }
+                            if (sameValues(posY) != -1){
+                                setColumn(posY[0], squareIndex, i);
+                            }
+                            if (sameValues(posX) != -1){
+                                setRow(posX[0], squareIndex, i);
+                            } 
                         }
+
                     }
                 }
             }
+            Initialize(posX,3);
+            Initialize(posY,3);
+
         }
-
-
-
     }
 
     //*Checks if the array has same values
     int sameValues(int arr[3]){
         bool same = false;
         int sharedIndex = -1;
-
         if(arr[0] != arr[1] || (arr[1] != arr[2] && arr[2] != 0)){
             return -1;
         }
@@ -304,19 +344,22 @@ public:
 
     //*Solves the board
     void Solve(){
-        int i = 0;
-        while(!BoardSolved() && i<3){
+        int i = 1;
+        while(!BoardSolved() && i<4){
             for (int i=0; i<GRID; i++){
                 for (int j=0; j<GRID; j++){
                     if(board[i][j].getSolved()){
                         standardRule(i,j);
                     }
-                    pairInSquare(i);
                 }
+                    pairInSquare(i);
+                    //cout << (board[6][0].getSolved()? "Yes":"No") << "\t";
+                    //board[6][0].printArray();
             }
             i++;
         }
         cout << endl;
+        //cout << (board[6][0].getSolved()? "Yes":"No") << "\t";
         printBoard();
     }
 
@@ -344,15 +387,15 @@ int main(){
           {0, 0, 0, 0, 8, 0, 0, 7, 9}};
 
     int board[9][9] 
-         {{8, 7, 9, 0, 4, 0, 0, 0, 0},
-          {6, 0, 0, 0, 0, 2, 9, 0, 0},
-          {0, 0, 0, 0, 0, 7, 0, 8, 0},
-          {0, 2, 4, 0, 0, 6, 0, 0, 3},
-          {0, 0, 1, 0, 0, 0, 2, 0, 0},
-          {3, 0, 0, 2, 0, 0, 4, 9, 0},
-          {0, 4, 0, 8, 0, 0, 0, 0, 0},
-          {0, 0, 3, 7, 0, 0, 0, 0, 4},
-          {0, 0, 0, 0, 5, 0, 3, 6, 8}};
+         {{0, 0, 0, 6, 3, 2, 0, 0, 0},
+          {0, 0, 0, 9, 0, 0, 0, 0, 3},
+          {3, 0, 7, 0, 0, 0, 0, 0, 0},
+          {8, 3, 0, 7, 0, 0, 0, 0, 9},
+          {4, 0, 5, 0, 0, 0, 6, 0, 8},
+          {6, 1, 0, 0, 0, 3, 0, 2, 0},
+          {0, 0, 0, 0, 0, 0, 5, 0, 6},
+          {7, 0, 0, 0, 0, 8, 0, 0, 0},
+          {0, 0, 0, 3, 5, 1, 0, 7, 0}};
 
     Board b(board);
 
@@ -361,7 +404,7 @@ int main(){
     
     Board b2(ezBoard);
 
-    b2.Solve();
+    //b2.Solve();
     
     return 0;
 }
