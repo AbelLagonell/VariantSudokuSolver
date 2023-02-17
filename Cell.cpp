@@ -3,6 +3,7 @@
 */
 
 #include <iostream>
+#include "CellManip.cpp"
 
 #define VALUES 9
 
@@ -14,8 +15,8 @@ private:
 public:
 
     //*Returns the bool array
-    bool * getValue(){
-        bool * array = new bool[VALUES];
+    bool* getArray(){
+        bool* array = new bool[VALUES];
         for(int i = 0; i < VALUES; i++){
             array[i] = value[i];
         }
@@ -24,22 +25,12 @@ public:
 
     //*Constructor
     Cell(){
-        for(int i = 0; i < VALUES; i++){
-            value[i] = true;
-        }
-    }
-
-    //*Prints outs possible numbers
-    void printArray(){
-        for (int i = 0; i<VALUES; i++){
-            std::cout << ((value[i])? i+1:0) << ", ";
-        }
-        std::cout << std::endl;
+        Initialize(value, VALUES, true);
     }
 
     //*Checks if there is a single possibility
     void checkSolved(){
-        if (checkSingularity())
+        if (CheckSingle(value, VALUES) != -1)
             solved = true;
     }
 
@@ -49,77 +40,25 @@ public:
     }
 
     //*Setting the value of the cell making everything but the index position 
-    void setValue(int index){
-        if ( index < 0 || index > 8 || solved){
+    void setValueBUT(int index){
+        if (solved){
             return;
         }
-        for(int j = 0; j < VALUES; j++){
-            if(j != index){
-                value[j] = false;
-            }
-        }
+        SetIndexBUT(value, VALUES, index, false);
         solved = true;
-    }
-
-    //*Setting the index of the cell to false 
-    void setSingularValue(int index){
-        if ( index < 0 || index > 8){
-            return;
-        }
-        for(int j = 0; j < VALUES; j++){
-            if(j == index){
-                value[j] = false;
-            }
-        }
-        checkSolved();
-    }
-
-    //* Sets the index of the cell to true
-    void setValueTrue(int index){
-        if ( index < 0 || index > 8){
-            return;
-        }
-        value[index] = true;
-        checkSolved();
     }
 
     //*Printing the value of the cell if it only has one true value
     void printValue(){
-        if (!(checkSingularity())){
-            std::cout << "0 ";
-            return;
-        }
-        for(int i = 0; i < VALUES; i++){
-            if(value[i]){
-                std::cout << i+1 << " ";
-            }
-        }
+        int num = CheckSingle(value, VALUES);
+        std::cout << ((num!=-1)? (num+1):0) << " ";
     }
 
-    //*Checks if the cell has one true value
-    bool checkSingularity(){
-        int count = 0;
-        for(int i = 0; i < VALUES; i++){
-            if(value[i]){
-                count++;
-            }
+    void printArray(){
+        for (int i =0; i < VALUES; i++){
+            std::cout << ((value[i]!=false)? i+1:0) << " ";
         }
-        if(count == 1){
-            solved=true;
-            return true;
-        }
-        return false;
+        
     }
 
-    //*returns the index of the number
-    int giveSingularity(){
-        if (!checkSingularity())
-            return -1;
-        for(int i = 0; i < VALUES; i++){
-            if(value[i]){
-                return i;
-            }
-        }
-        return -2;
-    }
 };
