@@ -1,17 +1,17 @@
 # Variant Sudoku Solver
 
-Trying to solve Sudokus variants by means of regular deduction.
+Trying to solve Sudoku variants by means of regular deduction.
 
 ## Current Implementations
 
 Simple Sudoku solver.
 
-## Furture Plans
+## Future Plans
 
 This program should have the ability to solve many variations of Sudoku
 The Variants I plan to implement include
 
-- X-Cross - Diagonals of the Sqaure board cannot have the same number
+- X-Cross - Diagonals of the Square board cannot have the same number
 - Chess Moves - A piece's movement represents where the numbers cannot be the same
   - King - 3x3 space
   - Knight - end of **L**
@@ -27,8 +27,14 @@ The Variants I plan to implement include
 
 ## Changelog
 
-1.0 - Finished the basic version of Sudoku (Feb 6, 2023)  
+1.0 - Finished the basic version of Sudoku (Feb 6, 2023)
 1.1 - Started Implementation of Diagonals (Feb 6, 2023)  
 1.2 - Updated the version numbers (1.1 used to be 2.0)
     - started implementation of a strategy for sudoku such that the solver can solve much harder sudoku puzzles. Implementation of X-cross to be delayed for this reason. (Feb 10, 2023)
 1.3 - The Sudoku currently is close to finishing a full sudoku only needing bug fixes of making sure the cell has only one possible number that it can be  
+2.0 - Due to the sudoku used for testing purposes a chance at making the code more readable was seized. Also with this restructure a finding of a website that explains the different strategies that can be used and will be using that as the core of the upcoming sudoku solver. The code will be transferred to the NewBoard.cpp with some of the basic functionality going towards the separate CellManip and Array2DCells  
+  
+## Sources
+
+[ Sudoku Wiki ] (<https://www.sudokuwiki.org/Sudoku_Solver_for_Android>)  
+This is the sudoku solver that gives me the strategies in written form  

@@ -27,7 +27,7 @@ private:
 
     //*Prints the cell at the given row and column
     void printCell(int row, int column){
-        board[row][column].printArray();
+        PrintArray(board[row][column].getArray(), GRID);
     }
 
     //*Prints the given array of size GRID
@@ -69,7 +69,7 @@ public:
         for(int i = 0; i < GRID; i++){
             for(int j = 0; j < GRID; j++){
                 int value = arr[i][j]-1;
-                board[i][j].setValue(value);
+                board[i][j].setValueBUT(value);
             }
         }
         Initialize(Columns, GRID);
@@ -100,46 +100,54 @@ public:
         setSquare(row,column);
     }
 
+    void hiddenStrategies(){
+        for (int i = 0; i < GRID; i++){
+            hiddenSingles(i);
+        }
+    }
+
     //*Sets it so that the row cannot have the same number
     void setRow(int row){
-        bool arr[GRID];
+        bool arr[GRID],
+             found = false;
         Initialize(arr, GRID);
-        //Checks if the cell is solved and if it is, it sets the index of the array to true
+        //Checks if the cell is solved and if it is, it sets the index of the array to true and Checks if the cell is not solved and according to the array sets the values to false
         for (int i=0; i<GRID; i++){
             if(board[row][i].getSolved()){
-                arr[board[row][i].giveSingularity()] = true;
+                arr[CheckSingle(board[row][i].getArray(),GRID)] = true;
+                found = true;
             }
-        }
-        //Checks if the cell is not solved and according to the array sets the values to false
-        for (int i=0; i<GRID; i++){
-            if(!board[row][i].getSolved()){
+            if(!board[row][i].getSolved() && found){
                 for (int j=0; j<GRID; j++){
                     if(arr[j])
-                        board[row][i].setSingularValue(j);
+                        SetIndex(board[row][i].getArray(), GRID, j, false);
                 }
             }
+            found = false;
         }
+        
     }
 
     //*Sets it so that the column cannot have the same number
     void setColumn(int column){
-        bool arr[GRID];
+        bool arr[GRID],
+             found = false;
         Initialize(arr, GRID);
-        //Checks if the cell is solved and if it is, it sets the index of the array to true
+        //Checks if the cell is solved and if it is, it sets the index of the array to true and Checks if the cell is not solved and according to the array sets the values to false
         for (int i=0; i<GRID; i++){
             if(board[i][column].getSolved()){
-                arr[board[i][column].giveSingularity()] = true;
+                arr[CheckSingle(board[i][column].getArray(), GRID)] = true;
+                found = true;
             }
-        }
-        //Checks if the cell is not solved and according to the array sets the values to false
-        for (int i=0; i<GRID; i++){
-            if(!board[i][column].getSolved()){
+            if(!board[i][column].getSolved() && found){
                 for (int j=0; j<GRID; j++){
                     if(arr[j])
-                        board[i][column].setSingularValue(j);
+                        SetIndex(board[i][column].getArray(), GRID, j, false);
                 }
             }
+            found = false;
         }
+        
     }
 
     //* Sets the column to not include the index apart from the cells that are in the square provided
@@ -147,7 +155,7 @@ public:
         for (int row=0; row<GRID; row++){
             if(!board[row][column].getSolved() && 3*floor(row/3) + floor(column/3) != squareIndex){
                 standardRule(row,column);
-                board[row][column].setSingularValue(index);
+                SetIndex(board[row][column].getArray(), GRID, index, false);
             }
         }
     }
@@ -157,7 +165,7 @@ public:
         for (int column=0; column<GRID; column++){
             if(!board[row][column].getSolved() && 3*floor(row/3) + floor(column/3) != squareIndex){
                 standardRule(row,column);
-                board[row][column].setSingularValue(index);
+                SetIndex(board[row][column].getArray(), GRID, index, false);
             }
         }
     }
@@ -172,7 +180,7 @@ public:
         for(int i = cRow; i<3+cRow;i++){
             for (int j =cColumn; j<3+cColumn; j++){
                 if(board[i][j].getSolved()){
-                    arr[board[i][j].giveSingularity()] = true;
+                    arr[CheckSingle(board[i][j].getArray(), GRID)] = true;
                 }
             }
         }
@@ -182,7 +190,7 @@ public:
                 if(!board[i][j].getSolved()){
                     for (int k=0; k<GRID; k++){
                         if(arr[k])
-                            board[i][j].setSingularValue(k);
+                            SetIndex(board[i][j].getArray(), GRID, k, false);
                     }
                 }
             }
@@ -198,7 +206,7 @@ public:
         }
         //Goes through the row taking note of all the used indexes
         for (int i=0; i<GRID; i++){
-            usedIndexes[board[row][i].giveSingularity()] = true;
+            usedIndexes[CheckSingle(board[row][i].getArray(), GRID)] = true;
         }
         //Makes sure that all the indexes are used
         for (int i=0; i<GRID; i++){
@@ -218,7 +226,7 @@ public:
         }
         //Goes through the column taking note of all the used indexes
         for (int i=0; i<GRID; i++){
-            usedIndexes[board[i][column].giveSingularity()] = true;
+            usedIndexes[CheckSingle(board[i][column].getArray(), GRID)] = true;
         }
         //Makes sure that all the indexes are used
         for (int i=0; i<GRID; i++){
@@ -242,7 +250,7 @@ public:
         for(int i = cRow; i<3+cRow;i++){
             for (int j =cColumn; j<3+cColumn; j++){
                 if(board[i][j].getSolved()){
-                    usedIndexes[board[i][j].giveSingularity()] = true;
+                    usedIndexes[CheckSingle(board[i][j].getArray(), GRID)] = true;
                 }
             }
         }
@@ -257,39 +265,57 @@ public:
         
     }
 
+    void hiddenSingles(int squareIndex){
+        int anchorX = 3*floor(squareIndex/3),
+            anchorY = 3*(squareIndex%3),
+            appearances[9] = {0,0,0,0,0,0,0,0,0};
+        numberOfAppearancesQUADRANT(appearances, squareIndex);
+        cout << "Square " << squareIndex << " appearances: \t";
+        printArr(appearances, 9);
+        for (int i=0; i<9; i++){
+            if(appearances[i] == 1){
+                for (int row =0; row<3; row++){
+                    for (int col =0; col<3; col++){
+                        if(board[anchorX+row][anchorY+col].getArray()[i]){
+                            SetIndex(board[anchorX+row][anchorY+col].getArray(), GRID, i, false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //*Counts the number of appearances
+    void numberOfAppearancesQUADRANT (int appearances[9], int squareIndex){
+        int anchorX = 3*floor(squareIndex/3),
+            anchorY = 3*(squareIndex%3);
+        for (int row =0; row<3; row++){
+            for (int col =0; col<3; col++){
+                if(!board[anchorX+row][anchorY+col].getSolved()){
+                    addToArray( appearances, board[anchorX+row][anchorY+col].getArray());
+                }
+            }
+        }
+    }
+
     //*Checks if there is a pair in the square
     void pairInSquare(int squareIndex){
         int anchorX = 3*floor(squareIndex/3),
             anchorY = 3*(squareIndex%3),
             posX[3] = {0, 0, 0},
             posY[3] = {0, 0, 0},
-            apperances[9] = {0,0,0,0,0,0,0,0,0};
+            appearances[9] = {0,0,0,0,0,0,0,0,0};
         bool sameX = false,
              sameY = false;
 
-        //Counts the number of apperances
-        for (int row =0; row<3; row++){
-            for (int col =0; col<3; col++){
-                if(!board[anchorX+row][anchorY+col].getSolved()){
-                    addToArray( apperances, board[anchorX+row][anchorY+col].getValue());
-                }
-            }
-        }
+        numberOfAppearancesQUADRANT(appearances, squareIndex);
+        
         //First checks if there is one instance and then sets it to that square and then uses pairs to dismiss posibilities
         for (int i=0; i<9; i++){
-            if (apperances[i] == 1){
-               for (int row =0; row<3; row++){
-                    for (int col =0; col<3; col++){
-                        if(!board[anchorX+row][anchorY+col].getSolved() && board[anchorX+row][anchorY+col].getValue()[i]){
-                            board[anchorX+row][anchorY+col].setValue(i);
-                        }
-                    }
-               } 
-            }
-            if(apperances[i] == 3 || apperances[i] == 2){
+            if(appearances[i] == 3 || appearances[i] == 2){
                 for (int row =0; row<3; row++){
                     for (int col =0; col<3; col++){
-                        if(!board[anchorX+row][anchorY+col].getSolved() && board[anchorX+row][anchorY+col].getValue()[i]){
+                        if(!board[anchorX+row][anchorY+col].getSolved() && board[anchorX+row][anchorY+col].getArray()[i]){
                             for (int pos=0; pos<3; pos++){
                                 if(posX[pos] == 0){
                                     posX[pos] = anchorX+row;
@@ -299,6 +325,7 @@ public:
                             }
                             if (sameValues(posY) != -1){
                                 setColumn(posY[0], squareIndex, i);
+                                board[8][2].printArray();
                             }
                             if (sameValues(posX) != -1){
                                 setRow(posX[0], squareIndex, i);
@@ -349,18 +376,18 @@ public:
             for (int i=0; i<GRID; i++){
                 for (int j=0; j<GRID; j++){
                     if(board[i][j].getSolved()){
+                        cout << "cell: \t";
+                        board[8][2].printArray();
                         standardRule(i,j);
                     }
                 }
-                    pairInSquare(i);
-                    //cout << (board[6][0].getSolved()? "Yes":"No") << "\t";
-                    //board[6][0].printArray();
+                    //pairInSquare(i);
             }
+            hiddenStrategies();
             i++;
+            printBoard();
         }
         cout << endl;
-        //cout << (board[6][0].getSolved()? "Yes":"No") << "\t";
-        printBoard();
     }
 
     //*Prints out "Loading..." with varying .. for showing program running
@@ -387,15 +414,15 @@ int main(){
           {0, 0, 0, 0, 8, 0, 0, 7, 9}};
 
     int board[9][9] 
-         {{0, 0, 0, 6, 3, 2, 0, 0, 0},
-          {0, 0, 0, 9, 0, 0, 0, 0, 3},
-          {3, 0, 7, 0, 0, 0, 0, 0, 0},
-          {8, 3, 0, 7, 0, 0, 0, 0, 9},
-          {4, 0, 5, 0, 0, 0, 6, 0, 8},
-          {6, 1, 0, 0, 0, 3, 0, 2, 0},
-          {0, 0, 0, 0, 0, 0, 5, 0, 6},
-          {7, 0, 0, 0, 0, 8, 0, 0, 0},
-          {0, 0, 0, 3, 5, 1, 0, 7, 0}};
+         {{0, 0, 0, 7, 0, 4, 0, 0, 5},
+          {0, 2, 0, 0, 1, 0, 0, 7, 0},
+          {0, 0, 0, 0, 8, 0, 0, 0, 2},
+          {0, 9, 0, 0, 0, 6, 2, 5, 0},
+          {6, 0, 0, 0, 7, 0, 0, 0, 8},
+          {0, 5, 3, 2, 0, 0, 0, 1, 0},
+          {4, 0, 0, 0, 9, 0, 0, 0, 0},
+          {0, 3, 0, 0, 6, 0, 0, 9, 0},
+          {2, 0, 0, 4, 0, 7, 0, 0, 0}};
 
     Board b(board);
 
