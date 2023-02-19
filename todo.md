@@ -1,7 +1,12 @@
 # For Internal Use (in VSCode need the TODO MD extension)
 
 (A) The strategies
-    (A) Row and columns pairs
+    (A) Hidden Singles
+    (B) Naked Pairs/Triplets
+    (C) Hidden Pairs/Triplets
+    (D) Naked/Hidden Quads
+    (E) Pointing Pairs
+    (F) Box/Line Reduction
 (B) X-Cross
 (B) Chess Moves
     (A) King

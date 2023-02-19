@@ -33,6 +33,7 @@ The Variants I plan to implement include
     - started implementation of a strategy for sudoku such that the solver can solve much harder sudoku puzzles. Implementation of X-cross to be delayed for this reason. (Feb 10, 2023)
 1.3 - The Sudoku currently is close to finishing a full sudoku only needing bug fixes of making sure the cell has only one possible number that it can be  
 2.0 - Due to the sudoku used for testing purposes a chance at making the code more readable was seized. Also with this restructure a finding of a website that explains the different strategies that can be used and will be using that as the core of the upcoming sudoku solver. The code will be transferred to the NewBoard.cpp with some of the basic functionality going towards the separate CellManip and Array2DCells  
+2.1 - Current Array2DCells, Cell, and CellManip files are all functional. Cell and Array2DCells work by making Array2DCells a class that holds a 2D array of cell objects. CellManip is just a functionality layer that allows both Array2DCells and Cell to work in modification of arrays.  
   
 ## Sources
 

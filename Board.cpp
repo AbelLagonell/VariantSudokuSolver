@@ -16,7 +16,6 @@
 using namespace std;
 
 #define GRID 9
-#define NUMOFRULES 1
 
 class Board{
 private:
@@ -310,7 +309,7 @@ public:
 
         numberOfAppearancesQUADRANT(appearances, squareIndex);
         
-        //First checks if there is one instance and then sets it to that square and then uses pairs to dismiss posibilities
+        //First checks if there is one instance and then sets it to that square and then uses pairs to dismiss possibilities
         for (int i=0; i<9; i++){
             if(appearances[i] == 3 || appearances[i] == 2){
                 for (int row =0; row<3; row++){
