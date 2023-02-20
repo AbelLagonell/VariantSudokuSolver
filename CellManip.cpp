@@ -2,7 +2,7 @@
  * @file CellManip.cpp
  * @author Abel Lagonell (alagonell1730@floridapoly.edu)
  * @brief A background file that contains functions to manipulate the Cell class.
- * @version 1.0
+ * @version 1.1
  * @date 2023-02-19
  * 
  * @copyright Copyright (c) 2023
@@ -65,4 +65,13 @@ int CheckSingle(const bool arr[], int size){
 void PrintIndex(const bool arr[], int size){
     int index = CheckSingle(arr, size);
     if (index != -1) std::cout << index+1 << " ";
+}
+
+//*Adds 1 to the index of an array if the value is true
+void addToArray(int arr[], bool value[], int size){
+    for (int i =0; i<size; i++){
+        if(value[i]){
+            arr[i]++;
+        }
+    }
 }

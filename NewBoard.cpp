@@ -2,7 +2,7 @@
  * @file NewBoard.cpp
  * @author Abel Lagonell (alagonell1730@floridapoly.edu)
  * @brief Sudoku solver using custom class Cell and Board in which the board is a 9x9 array of Cell objects.
- * @version 0.1
+ * @version 1.4.1
  * @date 2023-02-17
  * 
  * @copyright Copyright (c) 2023
@@ -11,46 +11,48 @@
 
 #include <cmath>
 #include <iostream>
-#include "Cell.cpp"
+#include "Array2DCells.cpp"
 
 using namespace std;
 
-#define GRID 9
-
-class Board{
+class Board : public Array2DCells{
 private:
-    Cell board[GRID][GRID]; //Holding the board
-    bool solved = false; //Is the board solved or not
-
     //*checks if Board is solved
     bool BoardSolved(){
+        for (int i=0; i<VALUES; i++){
+                if (!checkRow(i) || !checkColumn(i)) return false;
+        }
         return true;
     }
 
-    //*Checks a singular row to see if the row is solved
-    bool checkRow(int row){
-
+    //Sets up the standard rules of Sudoku
+    void standardRule(int row, int column){
+        int index = CheckSingle(array2D[row][column].getArray(), VALUES);
+        setRowBUT(row, column, index);
+        setColumnBUT(row, column, index);
+        setSquareBUT(row, column, index);
     }
 
-
+    //Tries to find hidden singles and marks them if it does
+    void hiddenSingle(int type, int section){
+        int numOfAppear[9];
+        enumeratePosiibilities(numOfAppear,type,section);
+        int index = checkForOne(numOfAppear);
+        if (index != -1){
+            setTheOne(type, section, index);
+        }
+    }
 
 public:
     //*Initializes the board with the initial array values given, to be set to the cells in the board
-    Board(int arr[GRID][GRID]){
-        for(int i = 0; i < GRID; i++){
-            for(int j = 0; j < GRID; j++){
-                int value = arr[i][j]-1;
-                board[i][j].setValueBUT(value);
-            }
-        }
-    }
+    Board(int arr[VALUES][VALUES]) : Array2DCells(arr) {}
 
     //*Prints the board
     void printBoard(){
         cout << "----------------------" <<endl;
-        for(int i = 0; i < GRID; i++){
-            for(int j = 0; j < GRID; j++){
-                board[i][j].printValue();
+        for(int i = 0; i < VALUES; i++){
+            for(int j = 0; j < VALUES; j++){
+                array2D[i][j].printValue();
                 if (j == 2 || j == 5){
                     cout << "| ";
                 }
@@ -65,12 +67,16 @@ public:
     //*Solves the board
     void Solve(){
         int i = 1;
-        while(!BoardSolved() && i<4){
-            for (int i=0; i<GRID; i++){
-                for (int j=0; j<GRID; j++){
-                    if(board[i][j].getSolved()){
+        while(!BoardSolved()){
+            for (int i=0; i<VALUES; i++){
+                for (int j=0; j<VALUES; j++){
+                    if(array2D[i][j].getSolved()){
+                        standardRule(i, j);
                     }
                 }
+                hiddenSingle(0,i);
+                hiddenSingle(1,i);
+                hiddenSingle(2,i);
             }
             i++;
             printBoard();
@@ -96,4 +102,5 @@ int main(){
 
     b2.Solve();
 
+    return 0;
 }

@@ -81,7 +81,7 @@ public:
             return;
         }
         SetIndexBUT(value, VALUES, index, false);
-        solved = true;
+        if (index != -1) solved = true;
     }
 
     //*Printing the value of the cell if it only has one true value

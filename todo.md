@@ -1,7 +1,7 @@
 # For Internal Use (in VSCode need the TODO MD extension)
 
 (A) The strategies
-    (A) Hidden Singles
+    (A) Hidden Singles {cm:2023-02-20}
     (B) Naked Pairs/Triplets
     (C) Hidden Pairs/Triplets
     (D) Naked/Hidden Quads
